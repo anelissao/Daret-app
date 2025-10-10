@@ -1,17 +1,69 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const contributionSchema = new mongoose.Schema(
-  {
-    group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    round: { type: Number, required: true },
-    amount: { type: Number, required: true, min: 0 },
-    paidAt: { type: Date, default: Date.now },
-    status: { type: String, enum: ['paid', 'pending', 'failed'], default: 'paid' },
-  },
-  { timestamps: true }
-);
+const contributionSchema = new mongoose.Schema({
+    group: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+        required: true
+    },
+    round: {
+        type: Number,
+        required: true
+    },
+    contributor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    beneficiary: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    dueDate: {
+        type: Date,
+        required: true
+    },
+    paidDate: Date,
+    status: {
+        type: String,
+        enum: ['pending', 'paid', 'late', 'missed'],
+        default: 'pending'
+    },
+    paymentProof: {
+        type: String
+    },
+    notes: {
+        type: String,
+        trim: true
+    },
+    delayDays: {
+        type: Number,
+        default: 0
+    }
+}, {
+    timestamps: true
+});
 
-contributionSchema.index({ group: 1, user: 1, round: 1 }, { unique: true });
+// Index for efficient queries
+contributionSchema.index({ group: 1, round: 1 });
+contributionSchema.index({ contributor: 1 });
 
-export const Contribution = mongoose.model('Contribution', contributionSchema);
+// Calculate delay days before saving
+contributionSchema.pre('save', function (next) {
+    if (this.status === 'paid' && this.paidDate && this.dueDate) {
+        const diffTime = this.paidDate - this.dueDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        this.delayDays = Math.max(0, diffDays);
+    }
+    next();
+});
+
+const Contribution = mongoose.model('Contribution', contributionSchema);
+
+module.exports = Contribution;
