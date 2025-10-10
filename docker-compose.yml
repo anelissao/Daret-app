@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: daret-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: daret
+    volumes:
+      - mongodb_data:/data/db
+
+  api:
+    build: .
+    container_name: daret-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/daret
+      - PORT=3000
+    depends_on:
+      - mongodb
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  mongodb_data:
