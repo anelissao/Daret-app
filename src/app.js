@@ -1,53 +1,46 @@
-import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
-import xss from 'xss-clean';
-import hpp from 'hpp';
-import morgan from 'morgan';
-import httpStatus from 'http-status';
+const express = require('express');
+const cors = require('cors');
+const errorHandler = require('./middleware/errorHandler');
 
-import { config } from './shared/config/index.js';
-import { errorHandler } from './shared/middleware/error.js';
-import { router as v1Router } from './routes/v1/index.js';
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const groupRoutes = require('./routes/groupRoutes');
+const contributionRoutes = require('./routes/contributionRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
-export const createApp = () => {
-  const app = express();
+const app = express();
 
-  // Trust proxy (if behind reverse proxy)
-  app.set('trust proxy', 1);
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  // Security & common middleware
-  app.use(helmet());
-  app.use(cors({ origin: true, credentials: true }));
-  app.use(express.json({ limit: '10kb' }));
-  app.use(express.urlencoded({ extended: false }));
-  app.use(mongoSanitize());
-  app.use(xss());
-  app.use(hpp());
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/contributions', contributionRoutes);
+app.use('/api/groups', messageRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/admin', adminRoutes);
 
-  if (config.isDev) {
-    app.use(morgan('dev'));
-  }
+// Health check
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', message: 'Server is running' });
+});
 
-  // Rate limiting
-  const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-  app.use('/v1', limiter);
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        status: 'error',
+        message: 'Route not found'
+    });
+});
 
-  // Routes
-  app.use('/v1', v1Router);
+// Error handler (must be last)
+app.use(errorHandler);
 
-  // Health check
-  app.get('/health', (_req, res) => res.status(httpStatus.OK).json({ status: 'ok' }));
-
-  // 404 handler
-  app.use((req, res) => {
-    res.status(httpStatus.NOT_FOUND).json({ message: 'Route not found' });
-  });
-
-  // Error handler
-  app.use(errorHandler);
-
-  return app;
-};
+module.exports = app;

@@ -1,30 +1,42 @@
-import { config } from './shared/config/index.js';
-import { connectMongo } from './shared/database/mongoose.js';
-import { createApp } from './app.js';
+require('dotenv').config();
+const app = require('./app');
+const database = require('./config/database');
+const notificationService = require('./services/notificationService');
 
-const start = async () => {
-  try {
-    await connectMongo(config.mongoUri);
-    const app = createApp();
-    const server = app.listen(config.port, () => {
-      // eslint-disable-next-line no-console
-      console.log(`Server running on http://localhost:${config.port}`);
+const PORT = process.env.PORT || 3000;
+
+// Connect to database
+database.connect()
+    .then(() => {
+        // Start server
+        const server = app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        });
+
+        // Schedule notification reminders
+        notificationService.scheduleReminders();
+
+        // Graceful shutdown
+        process.on('SIGTERM', () => {
+            console.log('SIGTERM received, shutting down gracefully');
+            server.close(() => {
+                console.log('Server closed');
+                database.disconnect();
+                process.exit(0);
+            });
+        });
+
+        process.on('SIGINT', () => {
+            console.log('SIGINT received, shutting down gracefully');
+            server.close(() => {
+                console.log('Server closed');
+                database.disconnect();
+                process.exit(0);
+            });
+        });
+    })
+    .catch((error) => {
+        console.error('Failed to start server:', error);
+        process.exit(1);
     });
-
-    const shutdown = (signal) => {
-      // eslint-disable-next-line no-console
-      console.log(`\n${signal} received. Shutting down gracefully...`);
-      server.close(() => process.exit(0));
-      setTimeout(() => process.exit(1), 10000).unref();
-    };
-
-    process.on('SIGINT', () => shutdown('SIGINT'));
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-};
-
-start();
