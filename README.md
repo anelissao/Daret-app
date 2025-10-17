@@ -520,6 +520,32 @@ This project follows standard development practices:
 
 ISC
 
+## Deployment Notes
+
+### Production Checklist
+
+- [ ] Update JWT_SECRET to a strong random string
+- [ ] Set NODE_ENV=production
+- [ ] Configure MongoDB connection string
+- [ ] Set up proper CORS origins
+- [ ] Enable HTTPS
+- [ ] Configure file upload limits
+- [ ] Set up MongoDB backups
+- [ ] Configure logging service
+- [ ] Set up monitoring
+
+### Environment Variables for Production
+
+```env
+NODE_ENV=production
+PORT=3000
+MONGODB_URI=mongodb://your-production-db-url
+JWT_SECRET=your-production-secret-key
+JWT_EXPIRE=7d
+UPLOAD_PATH=/var/www/uploads
+MAX_FILE_SIZE=5242880
+```
+
 ## Support
 
 For issues or questions, create a ticket through the API or contact the development team.
