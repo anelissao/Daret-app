@@ -1,6 +1,7 @@
 const Contribution = require('../models/Contribution');
 const Group = require('../models/Group');
 const reliabilityScoreService = require('./reliabilityScoreService');
+const notificationService = require('./notificationService');
 const { NotFoundError, ValidationError } = require('../utils/errors');
 
 class ContributionService {
@@ -140,6 +141,16 @@ class ContributionService {
         for (const contribution of lateContributions) {
             contribution.status = 'late';
             await contribution.save();
+
+            // Send notification
+            await notificationService.createNotification({
+                user: contribution.contributor,
+                type: 'system',
+                title: 'Late Contribution',
+                message: `Your contribution of ${contribution.amount} is now late. Please pay as soon as possible to avoid reliability score penalties.`,
+                relatedGroup: contribution.group,
+                relatedContribution: contribution._id
+            });
         }
 
         return lateContributions.length;
