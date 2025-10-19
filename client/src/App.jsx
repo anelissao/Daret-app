@@ -1,4 +1,49 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import Layout from '@/components/layout/Layout';
+
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen text-primary">Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+// Placeholder pages (will be implemented next)
+const Dashboard = () => <div className="text-white">Dashboard Placeholder</div>;
+const Login = () => <div className="text-white">Login Placeholder</div>;
+const Register = () => <div className="text-white">Register Placeholder</div>;
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected Routes */}
+      <Route element={
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      }>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Add more protected routes here */}
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
@@ -9,11 +54,9 @@ function App() {
       </div>
 
       <div className="relative z-10 font-sans">
-        <Routes>
-          <Route path="/" element={<div className="p-10 text-center"><h1 className="text-4xl font-bold gradient-text mb-4">Daret App</h1><p className="text-muted-foreground">Premium Tontine Management</p></div>} />
-          {/* Routes will be added here */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </div>
     </div>
   );
