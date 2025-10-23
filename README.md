@@ -9,6 +9,7 @@ Secure, clean, beginner-friendly REST API for a rotating savings group system. T
 - **Input validation** using Joi
 - **Security middlewares**: Helmet, CORS, rate limiting, mongo sanitize, XSS protection, HPP
  - **KYC (identity verification)**: encrypted uploads, simulated face verification, admin approve/reject
+ - **Group management**: create/join/contribute/round payout rotation, admin listing
 
 ## Getting Started
 
@@ -72,6 +73,31 @@ Secure, clean, beginner-friendly REST API for a rotating savings group system. T
 
 Encrypted files are stored under `storage/kyc/` using AES-256-GCM with `KYC_ENCRYPTION_KEY`.
 
+### Groups
+
+- **GET** `/v1/groups` — list groups where current user is a member
+- **POST** `/v1/groups` — create group (requires KYC verified)
+  ```json
+  {
+    "name": "Family Rosca",
+    "contributionAmount": 100,
+    "frequency": "monthly", // weekly | monthly | custom
+    "maxMembers": 10
+  }
+  ```
+- **GET** `/v1/groups/:groupId` — get basic group info and membership flag
+- **POST** `/v1/groups/:groupId/join` — join a group (requires KYC verified)
+- **POST** `/v1/groups/:groupId/contribute` — pay contribution for current round (requires KYC verified)
+
+Admin:
+- **GET** `/v1/groups/admin/all` — list all groups
+- **GET** `/v1/groups/admin/:groupId` — get any group by id
+
+Notes:
+- Each contribution is recorded in `Contribution` per `group/user/round`.
+- When all members have contributed for a round, a `Payout` is created to the next user in `rotationOrder` and the round advances.
+- `rotationOrder` defaults to join order starting with the creator; you can later extend to allow custom orders.
+
 ## Project Structure
 ```
 src/
@@ -80,19 +106,25 @@ src/
   controllers/
     AuthController.js
     KycController.js
+    GroupController.js
   middleware/
     auth.js
     kyc.js
   models/
     User.js
+    Group.js
+    Contribution.js
+    Payout.js
   routes/
     v1/
       auth.routes.js
       kyc.routes.js
+      groups.routes.js
       index.js
   services/
     AuthService.js
     KycService.js
+    GroupService.js
   shared/
     config/
       index.js
