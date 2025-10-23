@@ -33,6 +33,31 @@ const userSchema = new mongoose.Schema(
       number: { type: String, required: true, trim: true },
       type: { type: String, required: true, trim: true },
     },
+    kyc: {
+      status: {
+        type: String,
+        enum: ['unsubmitted', 'submitted', 'pending_review', 'verified', 'rejected'],
+        default: 'unsubmitted',
+      },
+      idFront: {
+        file: { type: String },
+        uploadedAt: { type: Date },
+      },
+      idBack: {
+        file: { type: String },
+        uploadedAt: { type: Date },
+      },
+      selfie: {
+        file: { type: String },
+        uploadedAt: { type: Date },
+      },
+      faceMatchScore: { type: Number },
+      submittedAt: { type: Date },
+      reviewRequestedAt: { type: Date },
+      verifiedAt: { type: Date },
+      rejectedAt: { type: Date },
+      rejectionReason: { type: String },
+    },
   },
   { timestamps: true }
 );
