@@ -2,6 +2,16 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
 
+// Pages
+import Login from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
+import KYC from '@/pages/auth/KYC';
+import Dashboard from '@/pages/dashboard/Dashboard';
+import GroupsList from '@/pages/groups/GroupsList';
+import CreateGroup from '@/pages/groups/CreateGroup';
+import GroupDetails from '@/pages/groups/GroupDetails';
+import ContributionsList from '@/pages/contributions/ContributionsList';
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -16,11 +26,6 @@ const ProtectedRoute = ({ children }) => {
 
   return children;
 };
-
-// Placeholder pages (will be implemented next)
-const Dashboard = () => <div className="text-white">Dashboard Placeholder</div>;
-const Login = () => <div className="text-white">Login Placeholder</div>;
-const Register = () => <div className="text-white">Register Placeholder</div>;
 
 function AppRoutes() {
   return (
@@ -37,7 +42,13 @@ function AppRoutes() {
       }>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* Add more protected routes here */}
+        <Route path="/kyc" element={<KYC />} />
+
+        {/* Groups */}
+        <Route path="/groups" element={<GroupsList />} />
+        <Route path="/groups/create" element={<CreateGroup />} />
+        <Route path="/groups/:id" element={<GroupDetails />} />
+        <Route path="/contributions" element={<ContributionsList />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
