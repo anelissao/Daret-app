@@ -15,7 +15,7 @@ const ContributionsList = () => {
 
     const fetchContributions = async () => {
         try {
-            const response = await axios.get('/api/contributions/my-contributions');
+            const response = await axios.get('/contributions/my-contributions');
             setContributions(response.data.data);
         } catch (error) {
             console.error('Failed to fetch contributions', error);

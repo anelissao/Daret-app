@@ -28,7 +28,7 @@ const CreateGroup = () => {
         setError('');
         setIsLoading(true);
         try {
-            await axios.post('/api/groups', {
+            await axios.post('/groups', {
                 ...formData,
                 rules: {
                     maxMembers: parseInt(formData.maxMembers),

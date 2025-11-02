@@ -32,7 +32,7 @@ const KYC = () => {
         formData.append('idCardImage', file);
 
         try {
-            await axios.post('/api/users/kyc', formData, {
+            await axios.post('/users/kyc', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

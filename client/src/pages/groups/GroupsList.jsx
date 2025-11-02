@@ -18,7 +18,7 @@ const GroupsList = () => {
 
     const fetchGroups = async () => {
         try {
-            const response = await axios.get('/api/groups');
+            const response = await axios.get('/groups');
             setGroups(response.data.data);
         } catch (error) {
             console.error('Failed to fetch groups', error);
@@ -70,8 +70,8 @@ const GroupsList = () => {
                                 <div className="flex justify-between items-start">
                                     <CardTitle className="text-xl text-white group-hover:text-primary transition-colors">{group.name}</CardTitle>
                                     <span className={`px-2 py-1 rounded text-xs font-medium uppercase tracking-wider ${group.status === 'active' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            group.status === 'completed' ? 'bg-blue-500/10 text-blue-500' :
-                                                'bg-yellow-500/10 text-yellow-500'
+                                        group.status === 'completed' ? 'bg-blue-500/10 text-blue-500' :
+                                            'bg-yellow-500/10 text-yellow-500'
                                         }`}>
                                         {group.status}
                                     </span>

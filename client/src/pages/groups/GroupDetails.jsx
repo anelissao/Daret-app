@@ -19,7 +19,7 @@ const GroupDetails = () => {
 
     const fetchGroupDetails = async () => {
         try {
-            const response = await axios.get(`/api/groups/${id}`);
+            const response = await axios.get(`/groups/${id}`);
             setGroup(response.data.data);
         } catch (error) {
             console.error('Failed to fetch group details', error);
@@ -30,7 +30,7 @@ const GroupDetails = () => {
 
     const handleJoin = async () => {
         try {
-            await axios.post(`/api/groups/${id}/join`);
+            await axios.post(`/groups/${id}/join`);
             fetchGroupDetails();
         } catch (error) {
             console.error('Failed to join group', error);
