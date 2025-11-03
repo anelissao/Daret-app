@@ -16,9 +16,12 @@ const ContributionsList = () => {
     const fetchContributions = async () => {
         try {
             const response = await axios.get('/contributions/my-contributions');
-            setContributions(response.data.data);
+            const payload = response?.data?.data;
+            const nextContributions = Array.isArray(payload) ? payload : payload?.contributions;
+            setContributions(Array.isArray(nextContributions) ? nextContributions : []);
         } catch (error) {
             console.error('Failed to fetch contributions', error);
+            setContributions([]);
         } finally {
             setIsLoading(false);
         }
@@ -49,7 +52,7 @@ const ContributionsList = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {contributions.map((contribution) => (
+                                {(Array.isArray(contributions) ? contributions : []).map((contribution) => (
                                     <tr key={contribution._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                         <td className="p-4 font-medium">{contribution.group?.name}</td>
                                         <td className="p-4">Round {contribution.round}</td>

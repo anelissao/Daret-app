@@ -20,7 +20,9 @@ const GroupDetails = () => {
     const fetchGroupDetails = async () => {
         try {
             const response = await axios.get(`/groups/${id}`);
-            setGroup(response.data.data);
+            const payload = response?.data?.data;
+            const nextGroup = payload?.group ?? payload;
+            setGroup(nextGroup ?? null);
         } catch (error) {
             console.error('Failed to fetch group details', error);
         } finally {

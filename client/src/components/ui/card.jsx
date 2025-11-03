@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-const Card = React.forwardRef(({ className, glass = true, hover = false, ...props }, ref) => {
+const Card = React.forwardRef(({ className, glass = true, hover = false, whileHover, ...props }, ref) => {
     const Component = hover ? motion.div : 'div';
 
     return (
@@ -14,7 +14,7 @@ const Card = React.forwardRef(({ className, glass = true, hover = false, ...prop
                 hover && "hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300",
                 className
             )}
-            whileHover={hover ? { y: -5 } : undefined}
+            {...(hover ? { whileHover: whileHover ?? { y: -5 } } : {})}
             {...props}
         />
     );

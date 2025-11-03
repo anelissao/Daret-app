@@ -85,5 +85,15 @@ Visit **http://localhost:5173** to access the application.
 npm test
 ```
 
+## 🖼 Screenshots
+
+![Daret App Screenshot 1](./Daret-app-screenshots/Daret-app-1.png)
+
+![Daret App Screenshot 2](./Daret-app-screenshots/Daret-app-2.png)
+
+![Daret App Screenshot 3](./Daret-app-screenshots/Daret-app-3.png)
+
+![Daret App Screenshot 4](./Daret-app-screenshots/Daret-app-4.png)
+
 ## 📄 License
 ISC

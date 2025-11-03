@@ -19,16 +19,19 @@ const GroupsList = () => {
     const fetchGroups = async () => {
         try {
             const response = await axios.get('/groups');
-            setGroups(response.data.data);
+            const payload = response?.data?.data;
+            const nextGroups = Array.isArray(payload) ? payload : payload?.groups;
+            setGroups(Array.isArray(nextGroups) ? nextGroups : []);
         } catch (error) {
             console.error('Failed to fetch groups', error);
+            setGroups([]);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const filteredGroups = groups.filter(group =>
-        group.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredGroups = (Array.isArray(groups) ? groups : []).filter((group) =>
+        (group?.name ?? '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
